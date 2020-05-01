@@ -6,13 +6,14 @@ let rivalField = document.getElementById('rival-cards');
 let myField = document.getElementById('my-cards');
 let rivalCost = document.getElementById('rival-cost');
 let myCost = document.getElementById('my-cost');
+let turnButton = document.getElementById('turn-btn');
 let rivalDeckData = [];
 let myDeckData = [];
 let rivalHeroData;
 let myHeroData;
 let rivalFieldData = [];
 let myFieldData = [];
-let turn = true;
+let turn = true; //true 면 내 턴
 
 
 //카드 돔 연결
@@ -30,7 +31,7 @@ const connectCard = (data, dom, hero) => {
     }
     card.addEventListener('click', () => {
         if(turn){
-            if(!data.myCard){ //내 턴인데 상대 카드 눌렀을 때
+            if(!data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
                 return;
             }
             let currentCost = Number(myCost.textContent);
@@ -50,8 +51,10 @@ const connectCard = (data, dom, hero) => {
                 connectCard(data, myDeck);
             });
             myCost.textContent = currentCost - data.cost;
+            createMyDeck(1);
+            data.field = true; //필드에 올라간 카드
         } else {
-            if(data.myCard){ //내 턴인데 상대 카드 눌렀을 때
+            if(data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
                 return;
             }
             let currentCost = Number(rivalCost.textContent);
@@ -71,6 +74,8 @@ const connectCard = (data, dom, hero) => {
                 connectCard(data, rivalDeck);
             });
             myCost.textContent = currentCost - data.cost;
+            createRivalDeck(1);
+            data.field = true; //필드에 올라간 카드
         }
     })
     dom.appendChild(card);
@@ -80,6 +85,7 @@ const createRivalDeck = (num) => {
     for(let i = 0; i < num; i++ ){
         rivalDeckData.push(cardFactory());
     }
+    rivalDeck.innerHTML = '';
     rivalDeckData.forEach((data) => {
         connectCard(data, rivalDeck);
     });
@@ -89,6 +95,7 @@ const createMyDeck = (num) => {
     for(let i = 0; i < num; i++ ){
         myDeckData.push(cardFactory(false, true));
     }
+    myDeck.innerHTML = '';
     myDeckData.forEach((data) => {
         connectCard(data, myDeck);
     });
@@ -124,6 +131,13 @@ class Card {
 const cardFactory = (hero, myCard) => {
     return new Card(hero, myCard);
 }
+
+//턴 버튼
+turnButton.addEventListener('click', () => {
+    turn = !turn;
+    document.getElementById('rival').classList.toggle('turn');
+    document.getElementById('my').classList.toggle('turn');
+});
 
 //초기 셋팅
 const setting = () => {
