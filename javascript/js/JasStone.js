@@ -2,10 +2,18 @@ let rivalHero = document.getElementById('rival-hero');
 let myHero = document.getElementById('my-hero');
 let rivalDeck = document.getElementById('rival-deck');
 let myDeck = document.getElementById('my-deck');
+let rivalField = document.getElementById('rival-cards');
+let myField = document.getElementById('my-cards');
+let rivalCost = document.getElementById('rival-cost');
+let myCost = document.getElementById('my-cost');
 let rivalDeckData = [];
 let myDeckData = [];
 let rivalHeroData;
 let myHeroData;
+let rivalFieldData = [];
+let myFieldData = [];
+let turn = true;
+
 
 //카드 돔 연결
 const connectCard = (data, dom, hero) => {
@@ -20,6 +28,51 @@ const connectCard = (data, dom, hero) => {
         name.textContent = '영웅';
         card.appendChild(name);
     }
+    card.addEventListener('click', () => {
+        if(turn){
+            if(!data.myCard){ //내 턴인데 상대 카드 눌렀을 때
+                return;
+            }
+            let currentCost = Number(myCost.textContent);
+            if(currentCost < data.cost){ //내가 갖고있는 코스트보다 카드 코스트가 더 크면 return
+                return;
+            }
+            let idx = myDeckData.indexOf(data);
+            myDeckData.splice(idx, 1);
+            myFieldData.push(data);
+            connectCard(data, myField);
+            myDeck.innerHTML = '';
+            myField.innerHTML = '';
+            myFieldData.forEach(() => {
+                connectCard(data, myField);
+            });
+            myDeckData.forEach(() => {
+                connectCard(data, myDeck);
+            });
+            myCost.textContent = currentCost - data.cost;
+        } else {
+            if(data.myCard){ //내 턴인데 상대 카드 눌렀을 때
+                return;
+            }
+            let currentCost = Number(rivalCost.textContent);
+            if(currentCost < data.cost){ //내가 갖고있는 코스트보다 카드 코스트가 더 크면 return
+                return;
+            }
+            let idx = rivalDeckData.indexOf(card);
+            rivalDeckData.splice(idx, 1);
+            rivalFieldData.push(data);
+            connectCard(data, rivalField);
+            rivalDeck.innerHTML = '';
+            rivalField.innerHTML = '';
+            rivalFieldData.forEach(() => {
+                connectCard(data, rivalField);
+            });
+            rivalDeckData.forEach(() => {
+                connectCard(data, rivalDeck);
+            });
+            myCost.textContent = currentCost - data.cost;
+        }
+    })
     dom.appendChild(card);
 }
 //상대 덱 생성
@@ -34,7 +87,7 @@ const createRivalDeck = (num) => {
 //내 덱 생성
 const createMyDeck = (num) => {
     for(let i = 0; i < num; i++ ){
-        myDeckData.push(cardFactory());
+        myDeckData.push(cardFactory(false, true));
     }
     myDeckData.forEach((data) => {
         connectCard(data, myDeck);
@@ -43,31 +96,33 @@ const createMyDeck = (num) => {
 //상대 영웅 생성
 const createRivalHero = () => {
     rivalHeroData = cardFactory(true);
-    connectCard(rivalHeroData, rivalHero, true);
+    connectCard(rivalHeroData, rivalHero);
 }
 //내 영웅 생성
 const createMyHero = () => {
-    myHeroData = cardFactory(true);
+    myHeroData = cardFactory(true, true);
     connectCard(myHeroData, myHero, true);
 }
 
 //Card 생성자
 class Card {
-    constructor(hero) {
+    constructor(hero, myCard) {
         if(hero){
             this.att = Math.ceil(Math.random() * 2);
             this.hp = Math.ceil(Math.random() * 5 + 25);
             this.hero = true;
+            this.myCard = myCard;
         } else{
             this.att = Math.ceil(Math.random() * 5);
             this.hp = Math.ceil(Math.random() * 5);
             this.cost = (this.att + this.hp) / 2;
+            this.myCard = myCard;
         }
     }
 }
 //카드 공장
-const cardFactory = (hero) => {
-    return new Card(hero);
+const cardFactory = (hero, myCard) => {
+    return new Card(hero, myCard);
 }
 
 //초기 셋팅
