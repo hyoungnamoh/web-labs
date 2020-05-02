@@ -49,3 +49,44 @@ init();
 createRandom();
 draw();
 
+let dragFlag = false;
+let isDragging = false;
+let startLocation;
+let endLocation;
+
+//마우스 누를 때
+window.addEventListener('mousedown', (e) => {
+    dragFlag = true;
+    startLocation = [e.clientX, e.clientY];
+});
+
+//마우스 움직일 때
+window.addEventListener('mousemove', (e) => {
+    if(dragFlag){
+        isDragging = true;
+    }
+});
+
+//마우스 뗄 때
+window.addEventListener('mouseup', (e) => {
+
+    endLocation = [e.clientX, e.clientY];
+    let direction;
+    if(isDragging){
+
+        let xDiff = endLocation[0] - startLocation[0];
+        let yDiff = endLocation[1] - startLocation[1];
+        if(xDiff < 0 && Math.abs(xDiff) / Math.abs(yDiff) > 1) {
+            direction = 'left';
+        } else if(xDiff > 0 && Math.abs(xDiff) / Math.abs(yDiff) > 1){
+            direction = 'right';
+        } else if(xDiff > 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
+            direction = 'up';
+        } else if(xDiff < 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
+            direction = 'down';
+        }
+    }
+    console.log(direction);
+    dragFlag = false;
+    isDragging = false;
+});
