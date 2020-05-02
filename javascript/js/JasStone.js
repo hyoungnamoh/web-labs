@@ -6,6 +6,7 @@ let rival = {
     deckData: [],
     heroData: {},
     fieldData: [],
+    selectedCard: {},
 }
 // let rivalHero = document.getElementById('rival-hero');
 // let rivalDeck = document.getElementById('rival-deck');
@@ -23,6 +24,8 @@ let my = {
     deckData: [],
     heroData: {},
     fieldData: [],
+    selectedCard: {},
+    selectedCardData:{},
 }
 // let myHero = document.getElementById('my-hero');
 // let myDeck = document.getElementById('my-deck');
@@ -42,17 +45,29 @@ const deckToField = (data, myTurn) => {
     }
     let idx = obj.deckData.indexOf(data);
     obj.deckData.splice(idx, 1);
+    // console.log(data, obj.field, obj.fieldData);
     obj.fieldData.push(data);
     connectCard(data, obj.field);
     obj.deck.innerHTML = '';
     obj.field.innerHTML = '';
-    obj.fieldData.forEach(() => {
-        connectCard(data, obj.field);
+    obj.fieldData.forEach((d) => {
+        connectCard(d, obj.field);
     });
-    obj.deckData.forEach(() => {
-        connectCard(data, obj.deck);
+    obj.deckData.forEach((d) => {
+        connectCard(d, obj.deck);
     });
     obj.cost.textContent = currentCost - data.cost;
+}
+
+const redraw = (myTurn) => {
+    let obj = myTurn ? my : rival;
+    obj.fieldData.forEach((v) => {
+        connectCard(v, obj.field);
+    });
+    obj.deckData.forEach((v) => {
+        connectCard(v, obj.deck);
+    });
+    connectCard(obj.heroData, obj.hero, true);
 }
 //카드 돔 연결
 const connectCard = (data, dom, hero) => {
@@ -68,22 +83,44 @@ const connectCard = (data, dom, hero) => {
         card.appendChild(name);
     }
     card.addEventListener('click', () => {
+        console.log('click');
         if(turn){
-            if(!data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
+            if(!data.myCard && my.selectedCard && card.classList.contains('card-turnover')){ //상대 카드 선택했을 때 내 카드가 선택되어 있고 턴이 끝나지 않았으면(정상 공격 시)
+                data.hp = data.hp - my.selectedCard.att;
+                deckToField();
+                my.selectedCard.classList.remove('card-selected');
+                my.selectedCard.classList.add('card-turnover');
+                my.selectedCard = null;
+                my.selectedCardData = null;
+                console.log('click');
+                return;
+            } else if(!data.myCard){
                 return;
             }
-            if(!deckToField(data, true)){
-                createMyDeck(1);
+            if(data.field) {
+                card.parentNode.querySelectorAll('.card').forEach((c) => {
+                    c.classList.remove('card-selected');
+                });
+                card.classList.add('card-selected');
+                my.selectedCard = card;
+                my.selectedCardData = data;
+            } else{
+                if(!deckToField(data, true)){
+                    createMyDeck(1);
+                }
             }
+
         } else {
-            if(data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
+            if(data.myCard){
                 return;
             }
-            if(!deckToField(data, true)){
-                createMyDeck(1);
+            if(data.field) {
+
+            } else {
+                if(!deckToField(data, false)){
+                    createRivalDeck(1);
+                }
             }
-            deckToField(data, false);
-            createRivalDeck(1);
         }
         data.field = true; //필드에 올라간 카드
     });
@@ -131,7 +168,7 @@ class Card {
         } else{
             this.att = Math.ceil(Math.random() * 5);
             this.hp = Math.ceil(Math.random() * 5);
-            this.cost = (this.att + this.hp) / 2;
+            this.cost = Math.ceil((this.att + this.hp) / 2);
             this.myCard = myCard;
         }
     }
