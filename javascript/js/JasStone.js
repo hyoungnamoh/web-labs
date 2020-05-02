@@ -1,21 +1,59 @@
-let rivalHero = document.getElementById('rival-hero');
-let myHero = document.getElementById('my-hero');
-let rivalDeck = document.getElementById('rival-deck');
-let myDeck = document.getElementById('my-deck');
-let rivalField = document.getElementById('rival-cards');
-let myField = document.getElementById('my-cards');
-let rivalCost = document.getElementById('rival-cost');
-let myCost = document.getElementById('my-cost');
+let rival = {
+    hero: document.getElementById('rival-hero'),
+    deck: document.getElementById('rival-deck'),
+    field: document.getElementById('rival-cards'),
+    cost: document.getElementById('rival-cost'),
+    deckData: [],
+    heroData: {},
+    fieldData: [],
+}
+// let rivalHero = document.getElementById('rival-hero');
+// let rivalDeck = document.getElementById('rival-deck');
+// let rivalField = document.getElementById('rival-cards');
+// let rivalCost = document.getElementById('rival-cost');
+// let rivalDeckData = [];
+// let rivalHeroData;
+// let rivalFieldData = [];
+
+let my = {
+    hero: document.getElementById('my-hero'),
+    deck: document.getElementById('my-deck'),
+    field: document.getElementById('my-cards'),
+    cost: document.getElementById('my-cost'),
+    deckData: [],
+    heroData: {},
+    fieldData: [],
+}
+// let myHero = document.getElementById('my-hero');
+// let myDeck = document.getElementById('my-deck');
+// let myField = document.getElementById('my-cards');
+// let myCost = document.getElementById('my-cost');
+// let myDeckData = [];
+// let myHeroData;
+// let myFieldData = [];
 let turnButton = document.getElementById('turn-btn');
-let rivalDeckData = [];
-let myDeckData = [];
-let rivalHeroData;
-let myHeroData;
-let rivalFieldData = [];
-let myFieldData = [];
 let turn = true; //true 면 내 턴
 
-
+const deckToField = (data, myTurn) => {
+    let obj = myTurn ? my : rival;
+    let currentCost = Number(obj.cost.textContent);
+    if(currentCost < data.cost){ //내가 갖고있는 코스트보다 카드 코스트가 더 크면 return
+        return true;
+    }
+    let idx = obj.deckData.indexOf(data);
+    obj.deckData.splice(idx, 1);
+    obj.fieldData.push(data);
+    connectCard(data, obj.field);
+    obj.deck.innerHTML = '';
+    obj.field.innerHTML = '';
+    obj.fieldData.forEach(() => {
+        connectCard(data, obj.field);
+    });
+    obj.deckData.forEach(() => {
+        connectCard(data, obj.deck);
+    });
+    obj.cost.textContent = currentCost - data.cost;
+}
 //카드 돔 연결
 const connectCard = (data, dom, hero) => {
     //cloneNode로 기존 태그를 그대로 복사, 인자에 true 넣으면 내부까지 전부 복사
@@ -34,81 +72,52 @@ const connectCard = (data, dom, hero) => {
             if(!data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
                 return;
             }
-            let currentCost = Number(myCost.textContent);
-            if(currentCost < data.cost){ //내가 갖고있는 코스트보다 카드 코스트가 더 크면 return
-                return;
+            if(!deckToField(data, true)){
+                createMyDeck(1);
             }
-            let idx = myDeckData.indexOf(data);
-            myDeckData.splice(idx, 1);
-            myFieldData.push(data);
-            connectCard(data, myField);
-            myDeck.innerHTML = '';
-            myField.innerHTML = '';
-            myFieldData.forEach(() => {
-                connectCard(data, myField);
-            });
-            myDeckData.forEach(() => {
-                connectCard(data, myDeck);
-            });
-            myCost.textContent = currentCost - data.cost;
-            createMyDeck(1);
-            data.field = true; //필드에 올라간 카드
         } else {
             if(data.myCard || data.field){ //내 턴인데 상대 카드 눌렀을 때
                 return;
             }
-            let currentCost = Number(rivalCost.textContent);
-            if(currentCost < data.cost){ //내가 갖고있는 코스트보다 카드 코스트가 더 크면 return
-                return;
+            if(!deckToField(data, true)){
+                createMyDeck(1);
             }
-            let idx = rivalDeckData.indexOf(card);
-            rivalDeckData.splice(idx, 1);
-            rivalFieldData.push(data);
-            connectCard(data, rivalField);
-            rivalDeck.innerHTML = '';
-            rivalField.innerHTML = '';
-            rivalFieldData.forEach(() => {
-                connectCard(data, rivalField);
-            });
-            rivalDeckData.forEach(() => {
-                connectCard(data, rivalDeck);
-            });
-            myCost.textContent = currentCost - data.cost;
+            deckToField(data, false);
             createRivalDeck(1);
-            data.field = true; //필드에 올라간 카드
         }
-    })
+        data.field = true; //필드에 올라간 카드
+    });
     dom.appendChild(card);
 }
 //상대 덱 생성
 const createRivalDeck = (num) => {
     for(let i = 0; i < num; i++ ){
-        rivalDeckData.push(cardFactory());
+        rival.deckData.push(cardFactory());
     }
-    rivalDeck.innerHTML = '';
-    rivalDeckData.forEach((data) => {
-        connectCard(data, rivalDeck);
+    rival.deck.innerHTML = '';
+    rival.deckData.forEach((data) => {
+        connectCard(data, rival.deck);
     });
 }
 //내 덱 생성
 const createMyDeck = (num) => {
     for(let i = 0; i < num; i++ ){
-        myDeckData.push(cardFactory(false, true));
+        my.deckData.push(cardFactory(false, true));
     }
-    myDeck.innerHTML = '';
-    myDeckData.forEach((data) => {
-        connectCard(data, myDeck);
+    my.deck.innerHTML = '';
+    my.deckData.forEach((data) => {
+        connectCard(data, my.deck);
     });
 }
 //상대 영웅 생성
 const createRivalHero = () => {
-    rivalHeroData = cardFactory(true);
-    connectCard(rivalHeroData, rivalHero);
+    rival.heroData = cardFactory(true);
+    connectCard(rival.heroData, rival.hero, true);
 }
 //내 영웅 생성
 const createMyHero = () => {
-    myHeroData = cardFactory(true, true);
-    connectCard(myHeroData, myHero, true);
+    my.heroData = cardFactory(true, true);
+    connectCard(my.heroData, my.hero, true);
 }
 
 //Card 생성자
