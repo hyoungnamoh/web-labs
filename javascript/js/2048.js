@@ -69,11 +69,9 @@ window.addEventListener('mousemove', (e) => {
 
 //마우스 뗄 때
 window.addEventListener('mouseup', (e) => {
-
     endLocation = [e.clientX, e.clientY];
     let direction;
     if(isDragging){
-
         let xDiff = endLocation[0] - startLocation[0];
         let yDiff = endLocation[1] - startLocation[1];
         if(xDiff < 0 && Math.abs(xDiff) / Math.abs(yDiff) > 1) {
@@ -86,7 +84,56 @@ window.addEventListener('mouseup', (e) => {
             direction = 'down';
         }
     }
-    console.log(direction);
     dragFlag = false;
     isDragging = false;
+    let newData;
+
+    switch(direction){
+        case 'left' :
+            console.log(direction);
+            break;
+        case 'right' :
+            console.log(direction);
+            break;
+        case 'up' :
+            console.log(direction);
+            newData = [[],[],[],[]];
+            //새로운 데이터 만들기
+            data.map((colData, i) => {
+                colData.map((rowData, j) => {
+                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨위에 넣음
+                        newData[j].push(rowData);
+                    }
+                });
+            });
+            console.log(newData);
+            //새로운 데이터 그리기
+            [1,2,3,4].map((rowData, i) => {
+                [1,2,3,4].map((colData, j) => {
+                    data[j][i] = newData[i][j] || 0;
+                });
+            });
+            break;
+        case 'down' :
+            console.log(direction);
+            newData = [[],[],[],[]];
+            //새로운 데이터 만들기
+            data.map((colData, i) => {
+                colData.map((rowData, j) => {
+                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨아래 넣음
+                        newData[j].unshift(rowData);
+                    }
+                });
+            });
+            console.log(newData);
+            //새로운 데이터 그리기
+            [1,2,3,4].map((rowData, i) => {
+                [1,2,3,4].map((colData, j) => {
+                    data[3-j][i] = newData[i][j] || 0;
+                });
+            });
+            console.log(data);
+            break;
+    }
+    createRandom();
 });
