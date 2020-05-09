@@ -91,9 +91,43 @@ window.addEventListener('mouseup', (e) => {
     switch(direction){
         case 'left' :
             console.log(direction);
+            newData = [[],[],[],[]];
+            //새로운 데이터 만들기
+            data.map((colData, i) => {
+                colData.map((rowData, j) => {
+                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨아래 넣음
+                        newData[i].push(rowData);
+                    }
+                });
+            });
+            console.log(newData);
+            //새로운 데이터 그리기
+            [1,2,3,4].map((rowData, i) => {
+                [1,2,3,4].map((colData, j) => {
+                    data[i][j] = newData[i][j] || 0;
+                });
+            });
+            console.log(data);
             break;
         case 'right' :
             console.log(direction);
+            newData = [[],[],[],[]];
+            //새로운 데이터 만들기
+            data.map((colData, i) => {
+                colData.map((rowData, j) => {
+                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨오른쪽 넣음
+                        newData[i].unshift(rowData);
+                    }
+                });
+            });
+            console.log(newData);
+            //새로운 데이터 그리기
+            [1,2,3,4].map((rowData, i) => {
+                [1,2,3,4].map((colData, j) => {
+                    data[i][3-j] = newData[i][j] || 0;
+                });
+            });
+            console.log(data);
             break;
         case 'up' :
             console.log(direction);
