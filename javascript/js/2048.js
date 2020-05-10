@@ -85,9 +85,9 @@ window.addEventListener('mouseup', (e) => {
             direction = 'left';
         } else if(xDiff > 0 && Math.abs(xDiff) / Math.abs(yDiff) > 1){
             direction = 'right';
-        } else if(xDiff > 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
+        } else if(yDiff < 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
             direction = 'up';
-        } else if(xDiff < 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
+        } else if(yDiff > 0 && Math.abs(xDiff) / Math.abs(yDiff) < 1){
             direction = 'down';
         }
     }
@@ -155,10 +155,10 @@ window.addEventListener('mouseup', (e) => {
             data.map((colData, i) => {
                 colData.map((rowData, j) => {
                     if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨위에 넣음
-                        if(newData[j][i-1] && newData[j][i-1] === rowData){
-                            console.log(true);
+                        if(newData[j][newData[j].length - 1] && newData[j][newData[j].length - 1] === rowData){
+                            newData[j][newData[j].length - 1] *= 2;
                             let currentScore = parseInt(score.textContent, 10);
-                            score.textContent = currentScore + newData[i][newData.length-1];
+                            score.textContent = currentScore + newData[j][newData[j].length-1];
                         } else {
                             newData[j].push(rowData);
                         }
@@ -179,13 +179,13 @@ window.addEventListener('mouseup', (e) => {
             //새로운 데이터 만들기
             data.map((colData, i) => {
                 colData.map((rowData, j) => {
-                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨아래 넣음
-                        if(newData[i][newData[i].length - 1] && newData[i][newData[i].length - 1] === rowData){
-                            newData[i][newData[i].length -1] *=2;
+                    if(rowData){ //원래 데이터를 돌면서 칸에 데이터가 있으면 newData엔 해당 행의 맨위에 넣음
+                        if(newData[j][0] && newData[j][0] === rowData){
+                            newData[j][0] *= 2;
                             let currentScore = parseInt(score.textContent, 10);
-                            score.textContent = currentScore + newData[i][newData.length-1];
-                        } else{
-                        newData[j].unshift(rowData);
+                            score.textContent = currentScore + newData[j][0];
+                        } else {
+                            newData[j].unshift(rowData);
                         }
                     }
                 });
