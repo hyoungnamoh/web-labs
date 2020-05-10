@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+    var arr = [];
+
+    for (var i = 0; i < 5; i++) {
+        arr[i] = function () {
+            return i;
+        };
+    }
+    /*
+        arr[0] = function () {
+            return i; //여기에 i는 함수가 실행되는 시점에 결정됨
+        };
+        arr[1] = function () {
+            return i;
+        };
+        arr[2] = function () {
+            return i;
+        };
+     */
+
+    for (var j = 0; j < arr.length; j++) {
+        console.log(arr[j]());
+    }
+</script>
+</body>
+</html>
